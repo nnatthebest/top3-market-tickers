@@ -1,59 +1,59 @@
 # top3-market-tickers
-Получает актуальный тикер ТОП3 бирж крипто-валют:
-    -https://exmo.me
-    -https://btc-e.nz
-    -https://poloniex.com   
-раз в 30 секунд.
+Получает актуальный тикер ТОП3 бирж крипто-валют:<br>
+    -https://exmo.me   <br>
+    -https://btc-e.nz <br>
+    -https://poloniex.com   <br>
+раз в 30 секунд.<br>
                                                                           
-
-Обновите индекс пакетов
-$ sudo apt-get update
-
-
-Установить CURL
-$ sudo apt-get install curl
+<hr>
+Обновите индекс пакетов<br>
+$ sudo apt-get update<br>
 
 
-Установите nodejs из репозитория
-$ curl -sL https://deb.nodesource.com/setup_7.x | sudo -E bash -
-$ sudo apt-get install nodejs
+Установить CURL<br>
+$ sudo apt-get install curl<br>
 
 
-Установить POSTGRESQL
-$# echo 'deb http://apt.postgresql.org/pub/repos/apt/ xenial-pgdg main' >> /etc/apt/sources.list.d/pgdg.list
-$# wget --quiet -O - https://www.postgresql.org/media/keys/ACCC4CF8.asc | sudo apt-key add -
-$# sudo apt-get update
-$# sudo apt-get install postgresql postgresql-contrib
-$# sudo su - postgres
-$# psql
-$# \password postgres //Установите пароль 1234
-$# \q
+Установите nodejs из репозитория<br>
+$ curl -sL https://deb.nodesource.com/setup_7.x | sudo -E bash -<br>
+$ sudo apt-get install nodejs<br>
 
 
-Установите YARN
-$ curl -sS https://dl.yarnpkg.com/debian/pubkey.gpg | sudo apt-key add -
-echo "deb https://dl.yarnpkg.com/debian/ stable main" | sudo tee /etc/apt/sources.list.d/yarn.list
-$sudo apt-get update && sudo apt-get install yarn
+Установить POSTGRESQL<br>
+$# echo 'deb http://apt.postgresql.org/pub/repos/apt/ xenial-pgdg main' >> /etc/apt/sources.list.d/pgdg.list<br>
+$# wget --quiet -O - https://www.postgresql.org/media/keys/ACCC4CF8.asc | sudo apt-key add -<br>
+$# sudo apt-get update<br>
+$# sudo apt-get install postgresql postgresql-contrib<br>
+$# sudo su - postgres<br>
+$# psql<br>
+$# \password postgres //Установите пароль 1234<br>
+$# \q<br>
 
 
-Установите GIT
-$ sudo apt-get install git
+Установите YARN<br>
+$ curl -sS https://dl.yarnpkg.com/debian/pubkey.gpg | sudo apt-key add -<br>
+echo "deb https://dl.yarnpkg.com/debian/ stable main" | sudo tee /etc/apt/sources.list.d/yarn.list<br>
+$sudo apt-get update && sudo apt-get install yarn<br>
 
 
-Скопируйте репозиторий
-$ sudo git clone https://github.com/zdzhamaldinov/top3-market-tickers.git
-
-Сделайте миграцию в базу данных
-$cd zdzhamaldinov/top3-market-tickers/scr
-$ ../node_modules/.bin/sequelize db:migrate
+Установите GIT<br>
+$ sudo apt-get install git<br>
 
 
-Перейти в папку
-$ cd top3-market-tickers
+Скопируйте репозиторий<br>
+$ sudo git clone https://github.com/zdzhamaldinov/top3-market-tickers.git<br>
 
-Подключить зависимости
-$ sudo yarn install
+Сделайте миграцию в базу данных<br>
+$cd zdzhamaldinov/top3-market-tickers/scr<br>
+$ ../node_modules/.bin/sequelize db:migrate<br>
 
 
-Запустить приложение
-$ node index.js
+Перейти в папку<br>
+$ cd top3-market-tickers<br>
+
+Подключить зависимости<br>
+$ sudo yarn install<br>
+
+
+Запустить приложение<br>
+$ node index.js<br>
