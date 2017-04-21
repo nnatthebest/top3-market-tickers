@@ -47,4 +47,4 @@ $ sudo yarn install
 
 
 Запустить приложение
-$
+$ node index.js
