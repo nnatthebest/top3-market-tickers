@@ -20,10 +20,14 @@ $ sudo apt-get install nodejs
 
 
 Установить POSTGRESQL
-# echo 'deb http://apt.postgresql.org/pub/repos/apt/ xenial-pgdg main' >> /etc/apt/sources.list.d/pgdg.list
-# wget --quiet -O - https://www.postgresql.org/media/keys/ACCC4CF8.asc | sudo apt-key add -
-# sudo apt-get update
-# sudo apt-get install postgresql postgresql-contrib
+$# echo 'deb http://apt.postgresql.org/pub/repos/apt/ xenial-pgdg main' >> /etc/apt/sources.list.d/pgdg.list
+$# wget --quiet -O - https://www.postgresql.org/media/keys/ACCC4CF8.asc | sudo apt-key add -
+$# sudo apt-get update
+$# sudo apt-get install postgresql postgresql-contrib
+$# sudo su - postgres
+$# psql
+$# \password postgres //Установите пароль 1234
+$# \q
 
 
 Установите YARN
@@ -39,7 +43,12 @@ $ sudo apt-get install git
 Скопируйте репозиторий
 $ sudo git clone https://github.com/zdzhamaldinov/top3-market-tickers.git
 
-Перейти в паку
+Сделайте миграцию в базу данных
+$cd zdzhamaldinov/top3-market-tickers/scr
+$ ../node_modules/.bin/sequelize db:migrate
+
+
+Перейти в папку
 $ cd top3-market-tickers
 
 Подключить зависимости
