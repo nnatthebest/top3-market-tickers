@@ -1,5 +1,5 @@
 # top3-market-tickers
-Получает актуальный тикер ТОП3 бирж крипто-валют:\n\r
+Получает актуальный тикер ТОП3 бирж крипто-валют:
     -https://exmo.me
     -https://btc-e.nz
     -https://poloniex.com   
