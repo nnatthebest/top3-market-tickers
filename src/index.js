@@ -18,7 +18,7 @@ const apiExmo ={url:'https://api.exmo.com/v1/ticker/',
 				marketName:'exmo' 
 				};
 
-setInterval(begineInterval,10000);
+setInterval(begineInterval,30000);
 
 
 function begineInterval() {
@@ -57,14 +57,14 @@ function toDatabase(lines){
 
 }
 
-//Обертка для формирования запроса API btc_e
+//ГЋГЎГҐГ°ГІГЄГ  Г¤Г«Гї ГґГ®Г°Г¬ГЁГ°Г®ГўГ Г­ГЁГї Г§Г ГЇГ°Г®Г±Г  API btc_e
 function getTickersBtcE(api,callback){	
 	request(api.urlInfo, function (error, response, body) {
 		if (!error && response.statusCode == 200) {
 			let info = JSON.parse(body);
 			let keys = Object.keys(info.pairs);
 			let apiUrl = keys.join('-');
-			//Сформированная строка запроса
+			//Г‘ГґГ®Г°Г¬ГЁГ°Г®ГўГ Г­Г­Г Гї Г±ГІГ°Г®ГЄГ  Г§Г ГЇГ°Г®Г±Г 
 			api.url = api.url + apiUrl+'?ignore_invalid=1';
 			getTickersValue(api,function(lines){
 				callback(lines)
@@ -75,7 +75,7 @@ function getTickersBtcE(api,callback){
 	});
 };
 
-//Парсер тикеров с подготовкой массива для записи в БД
+//ГЏГ Г°Г±ГҐГ° ГІГЁГЄГҐГ°Г®Гў Г± ГЇГ®Г¤ГЈГ®ГІГ®ГўГЄГ®Г© Г¬Г Г±Г±ГЁГўГ  Г¤Г«Гї Г§Г ГЇГЁГ±ГЁ Гў ГЃГ„
 function getTickersValue(api,callback) { 
 	request(api.url, function (error, response, body) {
 		if (!error && response.statusCode == 200) {
@@ -89,10 +89,10 @@ function getTickersValue(api,callback) {
 			
 			for (let k of keys) {
 				let obj = info[k];
-				let marketName_ = api.marketName; //Название рынка
-				let tickerPair_ = k;          // Пара
-				let tickerBuy_ = obj[tickerBuy];    //Цена покупки
-				let tickerSell_ = obj[tickerSell];  //Цена продажи
+				let marketName_ = api.marketName; //ГЌГ Г§ГўГ Г­ГЁГҐ Г°Г»Г­ГЄГ 
+				let tickerPair_ = k;          // ГЏГ Г°Г 
+				let tickerBuy_ = obj[tickerBuy];    //Г–ГҐГ­Г  ГЇГ®ГЄГіГЇГЄГЁ
+				let tickerSell_ = obj[tickerSell];  //Г–ГҐГ­Г  ГЇГ°Г®Г¤Г Г¦ГЁ
 				lines.push({'marketName':marketName_, 
 							'tickerPair':tickerPair_, 
 							'tickerBuy':tickerBuy_, 
