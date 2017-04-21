@@ -48,10 +48,8 @@ $cd zdzhamaldinov/top3-market-tickers/scr<br>
 $ ../node_modules/.bin/sequelize db:migrate<br>
 
 
-Перейти в папку<br>
-$ cd top3-market-tickers<br>
-
 Подключить зависимости<br>
+$ cd top3-market-tickers<br>
 $ sudo yarn install<br>
 
 
