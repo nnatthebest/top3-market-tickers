@@ -57,14 +57,14 @@ function toDatabase(lines){
 
 }
 
-//Îáåðòêà äëÿ ôîðìèðîâàíèÿ çàïðîñà API btc_e
+//Обертка для формирования запроса API btc_e
 function getTickersBtcE(api,callback){	
 	request(api.urlInfo, function (error, response, body) {
 		if (!error && response.statusCode == 200) {
 			let info = JSON.parse(body);
 			let keys = Object.keys(info.pairs);
 			let apiUrl = keys.join('-');
-			//Ñôîðìèðîâàííàÿ ñòðîêà çàïðîñà
+			//Сформированная строка запроса
 			api.url = api.url + apiUrl+'?ignore_invalid=1';
 			getTickersValue(api,function(lines){
 				callback(lines)
@@ -75,7 +75,7 @@ function getTickersBtcE(api,callback){
 	});
 };
 
-//Ïàðñåð òèêåðîâ ñ ïîäãîòîâêîé ìàññèâà äëÿ çàïèñè â ÁÄ
+//Парсер тикеров с подготовкой массива для записи в БД
 function getTickersValue(api,callback) { 
 	request(api.url, function (error, response, body) {
 		if (!error && response.statusCode == 200) {
@@ -89,10 +89,10 @@ function getTickersValue(api,callback) {
 			
 			for (let k of keys) {
 				let obj = info[k];
-				let marketName_ = api.marketName; //Íàçâàíèå ðûíêà
-				let tickerPair_ = k;          // Ïàðà
-				let tickerBuy_ = obj[tickerBuy];    //Öåíà ïîêóïêè
-				let tickerSell_ = obj[tickerSell];  //Öåíà ïðîäàæè
+				let marketName_ = api.marketName; //Название рынка
+				let tickerPair_ = k;          // Название пары
+				let tickerBuy_ = obj[tickerBuy];    //Цена покупки
+				let tickerSell_ = obj[tickerSell];  //Цена продажи
 				lines.push({'marketName':marketName_, 
 							'tickerPair':tickerPair_, 
 							'tickerBuy':tickerBuy_, 
