@@ -44,14 +44,15 @@ $ sudo apt-get install git<br>
 ### Скопируйте репозиторий<br>
 $ sudo git clone https://github.com/zdzhamaldinov/top3-market-tickers.git<br>
 
-### Сделайте миграцию в базу данных<br>
-$cd zdzhamaldinov/top3-market-tickers/scr<br>
-$ ../node_modules/.bin/sequelize db:migrate<br>
-
 
 ### Подключить зависимости<br>
 $ cd top3-market-tickers<br>
 $ sudo yarn install<br>
+
+
+### Сделайте миграцию в базу данных<br>
+$cd zdzhamaldinov/top3-market-tickers/scr<br>
+$ ../node_modules/.bin/sequelize db:migrate<br>
 
 
 ### Запустить приложение<br>
