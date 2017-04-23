@@ -49,9 +49,6 @@ function toDatabase(lines){
 			tickerBuy: line.tickerBuy,
 			tickerSell: line.tickerSell,
 			createdTime: line.createdTime
-			
-						}).then(function(user) {
-						res.json(user);
 						});		
 	}
 
