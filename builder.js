@@ -1,15 +1,6 @@
 var request = require('request');
 var models = require('./server/models/index');
 
-request
-  .get('http://google.com/img.png')
-  .on('response', function(response) {
-    console.log(response.statusCode) // 200 
-    console.log(response.headers['content-type']) // 'image/png' 
-  })
-
-
-
 
 class Tickers {
 	
