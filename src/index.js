@@ -1,106 +1,136 @@
 var request = require('request');
 var models = require('./server/models/index');
 
-const apiBtcE ={urlInfo:'https://btc-e.nz/api/3/info',
-				url:'https://btc-e.nz/api/3/ticker/',
-				tickerBuy:'buy',
-				tickerSell:'sell',
-				marketName:'btc-e' 
-				};
-const apiPoloniex ={url:'https://poloniex.com/public?command=returnTicker',
-				tickerBuy:'lowestAsk',
-				tickerSell:'highestBid',
-				marketName:'poloniex' 
-				};
-const apiExmo ={url:'https://api.exmo.com/v1/ticker/',
-				tickerBuy:'buy_price',
-				tickerSell:'sell_price',
-				marketName:'exmo' 
-				};
+
+
+class Tickers {
+	
+	constructor(urlInfo = '', urlApi = '',	tickerBuy = 'buy',
+				tickerSell = 'sell', marketName = ''){
+			
+		this.urlInfo = urlInfo;
+		this.urlApi = urlApi;
+		this.tickerBuy = tickerBuy;
+		this.tickerSell = tickerSell;
+		this.marketName = marketName;
+		this.lines = [];
+	}
+	
+	
+	getAllExistTickers (callback) {			
+		request(this.urlInfo, (error, response, body) => {
+			if (!error && response.statusCode == 200) {
+				let data = JSON.parse(body);
+				let keys = Object.keys(data.pairs);
+				let apiUrl = keys.join('-');
+				//Сформированная строка запроса
+				this.urlApi = this.urlApi + apiUrl+'?ignore_invalid=1';
+			}
+			callback('next');
+		});
+	}
+
+	getTickersValue(callback) { 
+	var self = this;
+		request(this.urlApi, function (error, response, body) {
+			let lines = [];
+			if (!error && response.statusCode == 200) {
+				let data = JSON.parse(body);
+				const keys = Object.keys(data);
+				let dt = new Date()
+				const createdTime = (dt.getTime()/1000);
+				for (let k of keys) {
+					let obj = data[k];
+					lines.push({'marketName':self.marketName, 
+								'tickerPair':k.toLowerCase(), 
+								'tickerBuy':obj[self.tickerBuy], 
+								'tickerSell':obj[self.tickerSell], 
+								'createdTime':createdTime});
+				}		
+			}
+			callback(lines);
+		});
+	}
+
+	writeToDatabase(lines){
+		lines ? '': console.log('Get value is\'t empty');
+		for (let line of lines) {
+			models.Tickers.create({
+				marketName: line.marketName,
+				tickerPair: line.tickerPair,
+				tickerBuy: line.tickerBuy,
+				tickerSell: line.tickerSell,
+				createdTime: line.createdTime  
+			});		
+		}
+	}
+}
+
+
+
+class marketExmo extends Tickers {
+	constructor() {				
+		let urlApi = 'https://api.exmo.com/v1/ticker/';
+		let tickerBuy = 'buy_price';
+		let tickerSell ='sell_price';
+		let marketName = 'exmo';
+		super('', urlApi, tickerBuy, tickerSell, marketName);			
+		}
+	
+	make (){
+		this.getTickersValue((lines)=>{
+				this.writeToDatabase(lines)		
+			});		
+		}
+	}
+	
+	
+class marketPolonex extends Tickers {
+	constructor() {				
+		let urlApi = 'https://poloniex.com/public?command=returnTicker';
+		let tickerBuy = 'lowestAsk';
+		let tickerSell ='highestBid';
+		let marketName = 'poloniex';
+		super('', urlApi, tickerBuy, tickerSell, marketName);			
+		}
+	
+	make (){
+		this.getTickersValue((lines)=>{
+				this.writeToDatabase(lines)		
+			});		
+		}
+	}
+	
+	
+class marketBtcE extends Tickers {
+	constructor() {				
+			let urlInfo = 'https://btc-e.nz/api/3/info';
+			let urlApi = 'https://btc-e.nz/api/3/ticker/';
+			let tickerBuy = 'buy';
+			let tickerSell = 'sell';
+			let marketName = 'btc-e';
+		super(urlInfo, urlApi, tickerBuy, tickerSell, marketName);			
+		}
+	
+	make (){
+		this.getAllExistTickers(()=>{
+			this.getTickersValue((lines)=>{
+				this.writeToDatabase(lines);		
+				});
+			});
+		
+		}
+	}
 
 setInterval(begineInterval,30000);
 
-
 function begineInterval() {
-  return new Promise(function (resolve, reject) {
-    resolve(setData());
-  })
+	return Promise.resolve().then(()=>{
+		let btc_e = new marketBtcE();
+		let poloniex = new marketPolonex();
+		let exmo = new marketExmo();
+		btc_e.make();
+		poloniex.make();
+		exmo.make();
+		});
 };
-
-function setData(){
-	getTickersBtcE(apiBtcE,function(lines){
-		toDatabase(lines)
-	});		
-	getTickersValue(apiExmo,function(lines){
-		toDatabase(lines)
-	});
-
-	getTickersValue(apiPoloniex,function(lines){
-		toDatabase(lines)
-	});	
-
-};		
-
-function toDatabase(lines){
-	for (line of lines) {
-		models.Tickers.create({
-			marketName: line.marketName,
-			tickerPair: line.tickerPair,
-			tickerBuy: line.tickerBuy,
-			tickerSell: line.tickerSell,
-			createdTime: line.createdTime
-						});		
-	}
-
-}
-
-//Обертка для формирования запроса API btc_e
-function getTickersBtcE(api,callback){	
-	request(api.urlInfo, function (error, response, body) {
-		if (!error && response.statusCode == 200) {
-			let info = JSON.parse(body);
-			let keys = Object.keys(info.pairs);
-			let apiUrl = keys.join('-');
-			//Сформированная строка запроса
-			api.url = api.url + apiUrl+'?ignore_invalid=1';
-			getTickersValue(api,function(lines){
-				callback(lines)
-			});	
-				
-			
-		}
-	});
-};
-
-//Парсер тикеров с подготовкой массива для записи в БД
-function getTickersValue(api,callback) { 
-	request(api.url, function (error, response, body) {
-		if (!error && response.statusCode == 200) {
-			let info = JSON.parse(body);
-			const keys = Object.keys(info);
-			const tickerBuy = api.tickerBuy;
-			const tickerSell = api.tickerSell;
-			const lines=[];
-			let dt = new Date()
-			const createdTime_ = (dt.getTime()/1000);
-			
-			for (let k of keys) {
-				let obj = info[k];
-				let marketName_ = api.marketName; //Название рынка
-				let tickerPair_ = k;          // Название пары
-				let tickerBuy_ = obj[tickerBuy];    //Цена покупки
-				let tickerSell_ = obj[tickerSell];  //Цена продажи
-				lines.push({'marketName':marketName_, 
-							'tickerPair':tickerPair_, 
-							'tickerBuy':tickerBuy_, 
-							'tickerSell':tickerSell_, 
-							'createdTime':createdTime_});
-			}
-		callback(lines);
-			
-		}
-	});
-};
-
-
-
