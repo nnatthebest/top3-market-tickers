@@ -6,12 +6,12 @@ function begineInterval() {
     return Promise.resolve().then( () => {
         let btc_e = new marketBtcE();
         btc_e.make();
-        /*
+        
         let poloniex = new marketPolonex();
         poloniex.make();
     
         let exmo = new marketExmo();
-        exmo.make();*/
+        exmo.make();
     });
 }
 
@@ -27,7 +27,7 @@ class marketExmo extends Tickers {
 
     make() {
         this.getTickersValue((lines) => {
-           //this.writeToDatabase(lines)  
+            this.writeToDatabase(lines)  
             console.log('exmo');  
         });    
     }
@@ -45,7 +45,7 @@ class marketPolonex extends Tickers {
   
     make() {
         this.getTickersValue((lines) => {
-            //this.writeToDatabase(lines)  
+            this.writeToDatabase(lines)  
             console.log('poloniex');  
         });    
     }
@@ -65,8 +65,7 @@ class marketBtcE extends Tickers {
     make() {
         this.getAllExistTickers(()=>{
             this.getTickersValue((lines)=>{
-                //this.writeToDatabase(lines);
-                console.log('btc-e');
+                this.writeToDatabase(lines);
             });
         });
     
