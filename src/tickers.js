@@ -13,7 +13,7 @@ module.exports = class Tickers {
     }
   
     getAllExistTickers() {      
-        return new Promise( (resolve, reject) => {   
+        return new Promise( (resolve) => {   
             request(this.urlInfo, (error, response, body) => {
                 if (!error && response.statusCode == 200) {
                     let data = JSON.parse(body);
@@ -28,7 +28,7 @@ module.exports = class Tickers {
     }
 
     getTickersValue() {
-        return new Promise( (resolve, reject) => { 
+        return new Promise( (resolve) => { 
             request(this.urlApi,  (error, response, body) => {
                 let lines = [];
 
@@ -57,13 +57,12 @@ module.exports = class Tickers {
     }
 
     writeToDatabase(lines) {
-        return new Promise( (resolve, reject) => { 
+        return new Promise( () => { 
             lines ? '': console.error('Get value isn\'t empty');
-            console.log(lines[0]);;
 
             for (let line of lines) {
-                    models.Tickers.create({
-                   marketName: line.marketName,
+                models.Tickers.create({
+                    marketName: line.marketName,
                     tickerPair: line.tickerPair,
                     tickerBuy: line.tickerBuy,
                     tickerSell: line.tickerSell,

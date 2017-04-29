@@ -65,7 +65,7 @@ class marketBtcE extends Tickers {
         this.getAllExistTickers().then( result =>  {
             this.getTickersValue().then( result => {
                 this.writeToDatabase(result);
-            })
+            });
         });
     }
 }
