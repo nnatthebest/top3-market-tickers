@@ -1,72 +1,98 @@
 var Tickers = require('./tickers.js');
 
-setInterval(begineInterval,3000);
+setInterval(marketsDirector,30000);
 
-function begineInterval() {
+function marketsDirector() {
     return Promise.resolve().then( () => {
         let btc_e = new marketBtcE();
-        btc_e.make();
+        btc_e.builderTickers();
         
         let poloniex = new marketPolonex();
-        poloniex.make();
+        poloniex.builderTickers();
     
         let exmo = new marketExmo();
-        exmo.make();
+        exmo.builderTickers();
 
     });
 }
 
 class marketExmo extends Tickers {
     constructor() {        
-        let urlApi = 'https://api.exmo.com/v1/ticker/';
+        let apiTicker = 'https://api.exmo.com/v1/ticker/';
         let tickerBuy = 'buy_price';
         let tickerSell ='sell_price';
         let marketName = 'exmo';
 
-        super('', urlApi, tickerBuy, tickerSell, marketName);      
+        super(apiTicker, tickerBuy, tickerSell, marketName);      
     }
 
-    make() {
-        this.getTickersValue().then( result => {
-            this.writeToDatabase(result);
+    builderTickers() {
+        this.getDataFromApi(this.apiTicker).then( data => {
+            let tickers = this.getTickersValue(data);
+            this.writeToDatabase(tickers);
         });    
     }
 }
 
+
 class marketPolonex extends Tickers {
-    constructor() {        
-        let urlApi = 'https://poloniex.com/public?command=returnTicker';
+    constructor() { 
+        let apiTicker = 'https://poloniex.com/public?command=returnTicker';
         let tickerBuy = 'lowestAsk';
         let tickerSell ='highestBid';
         let marketName = 'poloniex';
 
-        super('', urlApi, tickerBuy, tickerSell, marketName);      
+        super(apiTicker, tickerBuy, tickerSell, marketName);      
     }
-  
-    make() {
-        this.getTickersValue().then( result => {
-            this.writeToDatabase(result);
-        });   
+
+    builderTickers() {
+        this.getDataFromApi(this.apiTicker).then( data => {
+            let tickers = this.getTickersValue(data);
+            this.writeToDatabase(tickers);
+        });    
     }
 }
-  
+
 class marketBtcE extends Tickers {
-    constructor() {        
-        let urlInfo = 'https://btc-e.nz/api/3/info';
-        let urlApi = 'https://btc-e.nz/api/3/ticker/';
+    constructor() { 
+        let apiTicker = 'https://btc-e.nz/api/3/ticker/';
         let tickerBuy = 'buy';
         let tickerSell = 'sell';
         let marketName = 'btc-e';
 
-        super(urlInfo, urlApi, tickerBuy, tickerSell, marketName);      
+        super(apiTicker, tickerBuy, tickerSell, marketName);
+
+        this.urlInfo = 'https://btc-e.nz/api/3/info';        
+    }    
+    
+    builderTickers() {
+        this.getDataFromApi(this.urlInfo)
+
+            .then( data => {
+                this.formUrlApiTicker(data);
+                this.getDataFromApi(this.apiTicker)
+
+                    .then( data => {
+                        let tickers = this.getTickersValue(data);
+                        this.writeToDatabase(tickers);
+                    });
+            });   
     }
-  
-    make() {
-        this.getAllExistTickers().then( result =>  {
-            this.getTickersValue().then( result => {
-                this.writeToDatabase(result);
-            });
-        });
+
+    formUrlApiTicker(data){
+        let joinedTickers = this.joinGetTickers( this.getListKeyApiInfo(data) );
+        this.apiTicker = this.addTickersTailToUrl(this.apiTicker, joinedTickers);
+    }
+
+    getListKeyApiInfo(data) {
+        return Object.keys(data.pairs);
+    }
+
+    joinGetTickers(keys) {
+        return keys.join('-');
+    }
+
+    addTickersTailToUrl(urlApi, tail){
+        return urlApi = urlApi + tail +'?ignore_invalid=1';
     }
 }
-

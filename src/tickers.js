@@ -2,75 +2,74 @@ var request = require('request');
 var models = require('./server/models/index');
 
 module.exports = class Tickers {
-    constructor(urlInfo = '', urlApi = '',  tickerBuy = '',
+    constructor(apiTicker = '',  tickerBuy = '',
         tickerSell = '', marketName = '') {
       
-        this.urlInfo = urlInfo;
-        this.urlApi = urlApi;
+        this.apiTicker = apiTicker;
         this.tickerBuy = tickerBuy;
         this.tickerSell = tickerSell;
         this.marketName = marketName;
     }
-  
-    getAllExistTickers() {      
-        return new Promise( (resolve) => {   
-            request(this.urlInfo, (error, response, body) => {
-                if (!error && response.statusCode == 200) {
-                    let data = JSON.parse(body);
 
-                    let keys = Object.keys(data.pairs);
-                    let apiUrl = keys.join('-');
-                    this.urlApi = this.urlApi + apiUrl +'?ignore_invalid=1';
-                }
-                resolve(this.urlApi);
-            });
-        });
-    }
-
-    getTickersValue() {
+    getDataFromApi(apiUrl) {
         return new Promise( (resolve) => { 
-            request(this.urlApi,  (error, response, body) => {
-                let lines = [];
-
+            request(apiUrl,  (error, response, body) => {
                 if (!error && response.statusCode == 200) {
-                    let data = JSON.parse(body);
-                    const keysTickers = Object.keys(data);
-
-                    let dateNow = new Date();
-                    const createdTime = (dateNow.getTime()/1000);
-
-                    for (let k of keysTickers) {
-                        let obj = data[k];
-
-                        lines.push({ 'marketName' : this.marketName, 
-                            'tickerPair' : k.toLowerCase(), 
-                            'tickerBuy' : obj[ this.tickerBuy ], 
-                            'tickerSell' : obj[ this.tickerSell ], 
-                            'createdTime': createdTime
-                        });
-                    }    
+                    resolve( JSON.parse(body) ); 
                 }
-                resolve(lines);
             });
         });
-
     }
 
-    writeToDatabase(lines) {
-        return new Promise( () => { 
-            lines ? '': console.error('Get value isn\'t empty');
+    getTickersValue(data) {
+        let lines = [];
+        const keysTickers = this.getListKey(data);
+        const createdTime = this.getNowTime();
 
-            for (let line of lines) {
-                models.Tickers.create({
-                    marketName: line.marketName,
-                    tickerPair: line.tickerPair,
-                    tickerBuy: line.tickerBuy,
-                    tickerSell: line.tickerSell,
-                    createdTime: line.createdTime  
-                });    
+        for (let k of keysTickers) {
+            let obj = data[k];
+            
+            let tickerBuy = obj[ this.tickerBuy ];
+            let tickerSell = obj[ this.tickerSell ];
+
+            lines.push( this.formTickersLine(this.marketName, k, tickerBuy, tickerSell, createdTime) );
+        }
+        return lines;
+    }
+
+    getListKey(data) {
+        return Object.keys(data);
+    }
+
+    getNowTime() {
+        let dateNow = new Date();
+        return (dateNow.getTime()/1000);
+    }
+
+    formTickersLine(marketName, tickerPair, tickerBuy, tickerSell, createdTime){
+    	return {
+    		'marketName' : marketName, 
+            'tickerPair' : tickerPair.toLowerCase(), 
+            'tickerBuy' : tickerBuy, 
+            'tickerSell' : tickerSell, 
+            'createdTime': createdTime 
             }
-        });
 
     }
 
+    writeToDatabase(tickers) {
+        tickers ? '': console.error('Get value isn\'t empty');
+        console.log(tickers[0]);
+       
+        for (let ticker of tickers) {
+            models.Tickers.create({
+                marketName: ticker.marketName,
+                tickerPair: ticker.tickerPair,
+                tickerBuy: ticker.tickerBuy,
+                tickerSell: ticker.tickerSell,
+                createdTime: ticker.createdTime 
+            });  
+             
+        }
+    }
 };
